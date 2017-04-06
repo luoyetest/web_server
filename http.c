@@ -1,25 +1,22 @@
 #include "http.h" 
 
-const int http_init(){
-	pthread_t http_s;
+int http_init(){
 	non_keeping = (struct no_keep *)malloc(sizeof(struct no_keep));
-	keeping = (struct keep *)malloc(sizeof(struct keep));
-	if(non_keeping == NULL || keeping ==NULL){
+	if(non_keeping == NULL ){
 		return 0;
 	}
 	non_keeping->in = 0;
 	non_keeping->out = 0;
-	keeping->in = 0;
-	keeping->out = 0;
-	pthread_create(&http_s, NULL, (void *)http_serve, NULL);
 	return 1;
 }
 
-void http_start(){
+void *http_start(){
 	int  conn_fd; 
 	char buf[1000];
 	int len;
-	int server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+	//pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYCHRONOUS, NULL);
+	server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	//int server_sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	struct sockaddr_in server_sockaddr;
 	server_sockaddr.sin_family = AF_INET;
@@ -36,12 +33,8 @@ void http_start(){
 	}
 	printf("The service has been built at port(%d)\n", HTTP_PORT);
 	//struct sockaddr_in client_addr;
-    	socklen_t length = sizeof(struct sockaddr_in);
+	socklen_t length = sizeof(struct sockaddr_in);
     
-	if(!http_init()){
-		perror("http_init:error-->");
-		return;
-	}
 	while(1){
 		if((conn_fd = accept(server_sockfd, (struct sockaddr *)&non_keeping->sock[non_keeping->in], &length)) == -1){  
 			perror("http_start:accept error.");  
@@ -53,17 +46,18 @@ void http_start(){
 }
 
 void http_stop(){
-	//kill threads 
-	
+	close(server_sockfd);
 	//free memory
 	free(non_keeping);
-	free(keeping);
+	printf("The service has been stopped.\n");
 }
 
 void *http_serve(){
 	char *buf;
 	long int len;
 	int nk;
+	//pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYCHRONOUS, NULL);
 	buf = (char *)malloc(sizeof(char)*BUF_SIZE);
 	if(buf == NULL){
 		perror("http_serve:run out of memeroy-->");  
@@ -80,9 +74,8 @@ void *http_serve(){
 		if(!http_send()){
 			http_send();
 		}
-		if(nk == 2){
-			//change_que();
-		}
+		free((non_keeping->message[non_keeping->out]).url);
+		//free((non_keeping->message[non_keeping->out]).data);
 		close(non_keeping->sockfd[non_keeping->out]);
 		non_keeping->out = (++non_keeping->out)%QUE_SIZE;
 	}
@@ -148,6 +141,7 @@ int http_send(){
 	char index[2] = "\\0";
 	char file[1000];
 	char *buf;
+	char *p;
 	int len = 0;
 	if(cmp((non_keeping->message[non_keeping->out]).url, index)){
 		strcpy(file,"./index.html");
@@ -162,7 +156,8 @@ int http_send(){
 		strcat(file,(non_keeping->message[non_keeping->out]).url);
 	}
 	*/
-	printf("%s\n",file);
+	p = file[1];
+	printf("%s\n",p);
 	buf = joint_message(file, &len);
 	if(buf == NULL){
 		return 0;
@@ -181,25 +176,25 @@ char *joint_message(char *file, int *size){
 	buf = malloc(count + 500);
 	buf[0] = '\0';
 	if(count < 0){
-		len = brige(buf, "HTTP/1.1 404 Not Found\n", len);
-		len = brige(buf, "Connecion: close\n", len);
-		len = brige(buf, "Server: Luoye/1.0\n", len);
+		len = brige(buf, 404_NOT, len);
+		strcpy(file,"./404.html");
 	}
 	else{
-		len = brige(buf, "HTTP/1.1 200 OK\n", len);
-		fp = fopen(file, "r");
-		len = brige(buf, "Connecion: close\n", len);
-		len = brige(buf, "Server: Luoye/1.0\n", len);
-		len = brige(buf, "Content-Type: text/html\n", len);
-		//data
-		len = brige(buf, "\n", len);
-		while(!feof(fp)){
-			count = (int)fread(temp, sizeof(char), 1023, fp);
-			temp[++count] = '\0';
-			len = brige(buf, temp, len);
-		}
-		fclose(fp);
+		len = brige(buf, 200_OK, len);
 	}
+	fp = fopen(file, "r");
+	len = brige(buf, CONNECTION, len);
+	len = brige(buf, SERVER, len);
+	len = brige(buf, CONTENT_TYPE, len);
+	//data
+	len = brige(buf, "\n", len);
+	while(!feof(fp)){
+		count = (int)fread(temp, sizeof(char), 1023, fp);
+		temp[++count] = '\0';
+		len = brige(buf, temp, len);
+	}
+	fclose(fp);
+
 	*size = len-1;
 	return buf;
 }

@@ -1,13 +1,20 @@
+﻿**************************************************************
+V1.0
 
-服务器上只有两个文件：
-test.html
-index.html
+*Can only handle simple requests.
+*There are only two files on the server:
+	test.html
+	index.html
 
-（来自落夜）
-****************************************
+（by Luoye）
 
-There are only two files on the server:
-test.html
-index.html
+**************************************************************
+V1.1
+
+*Added control process to handle control command.
+*There are only some files on the server:
+	test.html
+	index.html
+	404.html-------(This document is required)
 
 （by Luoye）

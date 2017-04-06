@@ -11,8 +11,14 @@
 #include <sys/stat.h> 
 
 #define HTTP_PORT 80
-#define QUE_SIZE 100
+#define QUE_SIZE 1000
 #define BUF_SIZE 1024*2
+
+#define 200_OK 			"HTTP/1.1 200 OK\n"
+#define 404_NOT 		"HTTP/1.1 404 Not Found\n"
+#define	CONNECTION 		"Connecion: close\n"
+#define SERVER 			"Server: Luoye/1.1\n"
+#define CONTENT_TYPE 	"Content-Type: text/html\n"
 
 struct http{
 	char method[10];
@@ -31,19 +37,11 @@ struct no_keep{
 	struct http message[QUE_SIZE];
 };
 
-struct keep{
-	int in;
-	int out;
-	int sockfd[QUE_SIZE];
-	struct sockaddr_in sock[QUE_SIZE];
-	struct http message[QUE_SIZE];
-};
-
 struct no_keep *non_keeping;
-struct keep *keeping;
+int server_sockfd;
 
-void http_start();
-const int http_init();
+void *http_start();
+int http_init();
 void http_stop();
 int http_send();
 int http_recv();
@@ -51,7 +49,6 @@ void *deal_keeping();
 void *http_serve();
 int get_message(char *buf);
 char *joint_message(char *file, int *size);
-void change_que();
 unsigned int get_file_size(const char *path);
 int brige(char *f, char *s, int i);
 int cmp(char *f, char *s);
