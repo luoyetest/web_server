@@ -1,4 +1,16 @@
-﻿**************************************************************
+﻿HOW TO RUN?
+
+1.make
+
+2.sudo ./web
+
+3.start
+"start" is a command to run web server.
+
+4.stop
+"stop"
+
+**************************************************************
 V1.0
 
 *Can only handle simple requests.

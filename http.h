@@ -14,8 +14,8 @@
 #define QUE_SIZE 1000
 #define BUF_SIZE 1024*2
 
-#define 200_OK 			"HTTP/1.1 200 OK\n"
-#define 404_NOT 		"HTTP/1.1 404 Not Found\n"
+#define OK_200 			"HTTP/1.1 200 OK\n"
+#define NOT_404 		"HTTP/1.1 404 Not Found\n"
 #define	CONNECTION 		"Connecion: close\n"
 #define SERVER 			"Server: Luoye/1.1\n"
 #define CONTENT_TYPE 	"Content-Type: text/html\n"

@@ -22,7 +22,7 @@ int main(int argc, char *argv[]){
 			}
 			pthread_create(&http_listen, NULL, (void *)http_start, NULL);
 			pthread_create(&http_server, NULL, (void *)http_serve, NULL);
-			serve = 1
+			serve = 1;
 		}
 		else if(cmp(com, HTTP_COM_STOP)){
 			pthread_cancel(http_server);
@@ -31,15 +31,11 @@ int main(int argc, char *argv[]){
   			pthread_join(http_listen,NULL);
   			serve = 0;
 			http_stop();
-			continue;
-		}
-		else if(cmp(com, HTTP_COM_QUIT)){
-			pthread_cancel(http_server);
-			pthread_cancel(http_listen);
-  			pthread_join(http_server,NULL);
-  			pthread_join(http_listen,NULL);
-			http_stop();
 			break;
+		}
+		else{
+			printf("illegal command!\n");
+			continue;
 		}
 	}
 	return 0;

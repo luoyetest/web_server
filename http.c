@@ -15,7 +15,7 @@ void *http_start(){
 	char buf[1000];
 	int len;
 	//pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYCHRONOUS, NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 	server_sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	//int server_sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	struct sockaddr_in server_sockaddr;
@@ -57,7 +57,7 @@ void *http_serve(){
 	long int len;
 	int nk;
 	//pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYCHRONOUS, NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 	buf = (char *)malloc(sizeof(char)*BUF_SIZE);
 	if(buf == NULL){
 		perror("http_serve:run out of memeroy-->");  
@@ -141,7 +141,7 @@ int http_send(){
 	char index[2] = "\\0";
 	char file[1000];
 	char *buf;
-	char *p;
+	//char *p;
 	int len = 0;
 	if(cmp((non_keeping->message[non_keeping->out]).url, index)){
 		strcpy(file,"./index.html");
@@ -156,8 +156,8 @@ int http_send(){
 		strcat(file,(non_keeping->message[non_keeping->out]).url);
 	}
 	*/
-	p = file[1];
-	printf("%s\n",p);
+	
+	printf("%s\n",file);
 	buf = joint_message(file, &len);
 	if(buf == NULL){
 		return 0;
@@ -176,11 +176,11 @@ char *joint_message(char *file, int *size){
 	buf = malloc(count + 500);
 	buf[0] = '\0';
 	if(count < 0){
-		len = brige(buf, 404_NOT, len);
+		len = brige(buf, NOT_404, len);
 		strcpy(file,"./404.html");
 	}
 	else{
-		len = brige(buf, 200_OK, len);
+		len = brige(buf, OK_200, len);
 	}
 	fp = fopen(file, "r");
 	len = brige(buf, CONNECTION, len);

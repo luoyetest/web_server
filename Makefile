@@ -1,7 +1,7 @@
 # part of the makefile
 
 RM = rm
-CFLAGS = -O0 -g
+CFLAGS = -O0
 OBJECT = main.c http.c
 
 all: $(OBJECT)
